@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  docker:
+    image: docker:stable-dind
+    privileged: true
+    volumes:
+      - /var/lib/docker
+    command:
+      - --storage-driver=overlay
+  wordpress:
+    depends_on:
+      - docker
+    image: wordpress
+    volumes:
+      - ./wp-content:/var/www/html/wp-content
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    ports:
+      - 8080:80
+  db:
+    image: mysql:5.7
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+
+volumes:
+  db-data:
